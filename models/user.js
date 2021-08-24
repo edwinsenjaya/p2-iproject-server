@@ -53,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
       phoneNumber: DataTypes.STRING,
       address: DataTypes.STRING,
       budget: {
-        type: DataTypes.STRING,
+        type: DataTypes.DECIMAL,
         allowNull: false,
         validate: {
           notEmpty: {
@@ -61,9 +61,9 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
-      balance: DataTypes.INTEGER,
+      balance: DataTypes.DECIMAL,
       saving: {
-        type: DataTypes.STRING,
+        type: DataTypes.DECIMAL,
         allowNull: false,
         validate: {
           notEmpty: {

@@ -29,15 +29,15 @@ module.exports = {
       },
       budget: {
         allowNull: false,
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL,
       },
       balance: {
         allowNull: false,
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL,
       },
       saving: {
         allowNull: false,
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL,
       },
       createdAt: {
         allowNull: false,

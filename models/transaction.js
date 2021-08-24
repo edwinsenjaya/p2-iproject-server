@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       amount: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL,
         allowNull: false,
         validate: {
           notNull: {

@@ -7,6 +7,9 @@ const authorization = require("../middlewares/authorization");
 router.use(authentication);
 
 router.get("/", transController.viewTransactions);
+
 router.post("/", transController.addTransaction);
+
+router.patch("/currency/:id", transController.convertCurrency);
 
 module.exports = router;
