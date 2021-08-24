@@ -1,5 +1,6 @@
 const { Transaction, User, Tag, TransTag } = require("../models");
 const getRates = require("../apis/exchangerate");
+const { getBitcoin, getEthereum } = require("../apis/cryptorate");
 
 class Controller {
   static async viewTransactions(req, res, next) {
@@ -16,6 +17,27 @@ class Controller {
   }
 
   static async addTransaction(req, res, next) {
+    const { name, amount, date, TagId } = req.body;
+    try {
+      const dataTrans = await Transaction.create({
+        name,
+        amount,
+        date,
+        UserId: req.user.id,
+        currency: "IDR",
+      });
+
+      TransTag.create({
+        TransactionId: dataTrans.id,
+        TagId,
+      });
+      res.status(201).json(dataTrans);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async editTransaction(req, res, next) {
     const { name, amount, date, TagId } = req.body;
     try {
       const dataTrans = await Transaction.create({
@@ -108,7 +130,7 @@ class Controller {
           newData = newData[1][0];
 
           res.status(200).json({
-            message: `Successfully convert from  ${dataTrans.amount} ${convertFrom} to ${newData.amount} ${convertTo}`,
+            message: `Successfully convert from ${dataTrans.amount} ${convertFrom} to ${newData.amount} ${convertTo}`,
           });
         }
       }

@@ -10,6 +10,8 @@ router.get("/", transController.viewTransactions);
 
 router.post("/", transController.addTransaction);
 
-router.patch("/currency/:id", transController.convertCurrency);
+router.post("/:id", authorization, transController.editTransaction);
+
+router.patch("/currency/:id", authorization, transController.convertCurrency);
 
 module.exports = router;
