@@ -19,13 +19,13 @@ class Controller {
 
       res.status(201).json(data);
     } catch (err) {
-      console.log(err, "ERROR");
       next(err);
     }
   }
 
   static async login(req, res, next) {
-    let { email, password } = req.body;
+    console.log(req.body, "BODY");
+    const { email, password } = req.body;
     try {
       if (email === "" || password === "")
         throw { name: "Email/password incorrect" };

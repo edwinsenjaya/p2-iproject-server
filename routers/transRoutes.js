@@ -5,8 +5,8 @@ const authentication = require("../middlewares/authentication");
 const authorization = require("../middlewares/authorization");
 
 router.use(authentication);
-router.use(authorization);
 
 router.get("/", transController.viewTransactions);
+router.post("/", transController.addTransaction);
 
 module.exports = router;

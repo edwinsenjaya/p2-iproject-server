@@ -18,6 +18,7 @@ const authentication = async function (req, res, next) {
         id: dataExist.id,
         email: dataExist.email,
       };
+
       next();
     } else {
       throw { name: "Invalid token" };
