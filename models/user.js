@@ -1,12 +1,9 @@
 "use strict";
+const { hashPassword } = require("../helpers/bcrypt");
 const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
       User.hasMany(models.Transaction);
     }
@@ -17,16 +14,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         unique: {
-          args: true,
           message: "Email already registered",
         },
         validate: {
           isEmail: {
-            args: true,
             message: "Email required",
           },
           notNull: {
-            args: true,
             message: "Email required",
           },
         },
@@ -36,11 +30,9 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         validate: {
           notEmpty: {
-            args: true,
             message: "Password required",
           },
           notNull: {
-            args: true,
             message: "Password required",
           },
           len: {
@@ -54,7 +46,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         validate: {
           notEmpty: {
-            args: true,
             message: "Please input your name",
           },
         },
@@ -66,7 +57,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         validate: {
           notEmpty: {
-            args: true,
             message: "Please input your starting budget",
           },
         },
@@ -77,7 +67,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         validate: {
           notEmpty: {
-            args: true,
             message: "Please input your saving target",
           },
         },
@@ -88,5 +77,11 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "User",
     }
   );
+
+  User.beforeCreate((instance) => {
+    instance.password = hashPassword(instance.password);
+    instance.balance = instance.budget;
+  });
+
   return User;
 };
