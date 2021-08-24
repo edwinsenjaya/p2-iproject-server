@@ -10,7 +10,7 @@ router.use("/", userRoutes);
 
 router.use("/transaction", transactionRoute);
 
-router.use("/tags", tagRoute);
+router.use("/tag", tagRoute);
 
 router.use(errorHandler);
 

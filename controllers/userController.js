@@ -24,7 +24,6 @@ class Controller {
   }
 
   static async login(req, res, next) {
-    console.log(req.body, "BODY");
     const { email, password } = req.body;
     try {
       if (email === "" || password === "")
@@ -47,6 +46,27 @@ class Controller {
       } else {
         throw { name: "Email/password incorrect" };
       }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async addBudget(req, res, next) {
+    const { addBudget } = req.body;
+    try {
+      const existingData = await User.findByPk(+req.user.id);
+      const totalBudget = +existingData.budget + +addBudget;
+      const totalBalance = +existingData.balance + +addBudget;
+
+      let data = await User.update(
+        {
+          budget: totalBudget,
+          balance: totalBalance,
+        },
+        { where: { id: req.user.id }, returning: true }
+      );
+
+      res.status(200).json(data[1][0]);
     } catch (err) {
       next(err);
     }

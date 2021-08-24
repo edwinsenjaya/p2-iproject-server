@@ -7,4 +7,6 @@ router.use(authentication);
 
 router.get("/", tagController.viewTags);
 
+router.post("/:id", tagController.addTag);
+
 module.exports = router;

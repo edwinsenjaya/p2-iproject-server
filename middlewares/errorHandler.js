@@ -11,7 +11,7 @@ const errorHandler = function (err, req, res, next) {
     message = "Email already registered";
     code = 422;
   } else if (name === "NotFound") {
-    message = "ID Not Found";
+    message = "Data Not Found";
     code = 404;
   } else if (name === "Invalid token") {
     message = "Please log in first";

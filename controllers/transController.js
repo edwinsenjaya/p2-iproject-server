@@ -1,6 +1,6 @@
 const { Transaction, User, Tag, TransTag } = require("../models");
 const getRates = require("../apis/exchangerate");
-const { getBitcoin, getEthereum } = require("../apis/cryptorate");
+const getEthereum = require("../apis/cryptorate");
 
 class Controller {
   static async viewTransactions(req, res, next) {
@@ -76,9 +76,50 @@ class Controller {
         throw { name: "NotFound" };
       } else {
         const rate = await getRates();
+        const ethRate = await getEthereum();
         const convertFrom = dataTrans.currency;
 
-        if (convertTo === "EUR") {
+        if (convertTo === "ETH") {
+          const result = (dataTrans.amount / ethRate[convertFrom]).toFixed(5);
+
+          let newData = await Transaction.update(
+            {
+              currency: "ETH",
+              amount: result,
+            },
+            {
+              where: {
+                id: transId,
+              },
+              returning: true,
+            }
+          );
+          newData = newData[1][0];
+
+          res.status(200).json({
+            message: `Successfully convert from  ${dataTrans.amount} ${convertFrom} to ${newData.amount} ETH`,
+          });
+        } else if (convertFrom === "ETH") {
+          const result = (dataTrans.amount * ethRate[convertTo]).toFixed(2);
+
+          let newData = await Transaction.update(
+            {
+              currency: convertTo,
+              amount: result,
+            },
+            {
+              where: {
+                id: transId,
+              },
+              returning: true,
+            }
+          );
+          newData = newData[1][0];
+
+          res.status(200).json({
+            message: `Successfully convert from  ${dataTrans.amount} ETH to ${newData.amount} ${convertTo}`,
+          });
+        } else if (convertTo === "EUR") {
           const result = (dataTrans.amount / rate[convertFrom]).toFixed(2);
           let newData = await Transaction.update(
             {
@@ -147,12 +188,6 @@ class Controller {
       next(err);
     }
   }
-
-  // static async convertCrypto(req,res,next){
-  //   try{
-
-  //   }catch(err){next(err)}
-  // }
 }
 
 module.exports = Controller;
