@@ -10,7 +10,9 @@ router.get("/", transController.viewTransactions);
 
 router.post("/", transController.addTransaction);
 
-router.post("/:id", authorization, transController.editTransaction);
+router.put("/:id", authorization, transController.editTransaction);
+
+router.delete("/:id", authorization, transController.deleteTransaction);
 
 router.patch("/currency/:id", authorization, transController.convertCurrency);
 

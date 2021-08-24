@@ -17,14 +17,14 @@ class Controller {
   }
 
   static async addTransaction(req, res, next) {
-    const { name, amount, date, TagId } = req.body;
+    const { name, amount, date, currency, TagId } = req.body;
     try {
       const dataTrans = await Transaction.create({
         name,
         amount,
         date,
+        currency,
         UserId: req.user.id,
-        currency: "IDR",
       });
 
       TransTag.create({
@@ -38,21 +38,30 @@ class Controller {
   }
 
   static async editTransaction(req, res, next) {
-    const { name, amount, date, TagId } = req.body;
+    const transId = +req.params.id;
+    const { name, amount, date } = req.body;
     try {
-      const dataTrans = await Transaction.create({
-        name,
-        amount,
-        date,
-        UserId: req.user.id,
-        currency: "IDR",
-      });
+      const newData = await Transaction.update(
+        {
+          name,
+          amount,
+          date,
+          UserId: req.user.id,
+        },
+        { where: { id: transId }, returning: true }
+      );
 
-      TransTag.create({
-        TransactionId: dataTrans.id,
-        TagId,
-      });
-      res.status(201).json(dataTrans);
+      res.status(201).json(newData);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async deleteTransaction(req, res, next) {
+    const transId = +req.params.id;
+    try {
+      await Transaction.destroy({ where: { id: transId } });
+      res.status(201).json({ message: "Transaction successfully deleted" });
     } catch (err) {
       next(err);
     }
@@ -138,6 +147,12 @@ class Controller {
       next(err);
     }
   }
+
+  // static async convertCrypto(req,res,next){
+  //   try{
+
+  //   }catch(err){next(err)}
+  // }
 }
 
 module.exports = Controller;
