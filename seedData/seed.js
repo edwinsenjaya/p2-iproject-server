@@ -1,17 +1,3 @@
-const user = [
-  {
-    email: "user@mail.com",
-    password: "abcde",
-    fullName: "User Test",
-    phoneNumber: 12345678,
-    address: "Somewhere St",
-    budget: 30000000,
-    saving: 5000000,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
-
 const transactions = [
   {
     name: "Buy groceries",

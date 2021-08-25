@@ -1,5 +1,6 @@
 const { Transaction, User, Tag, TransTag } = require("../models");
 const convert = require("../helpers/convertCurrency");
+const sendMail = require("../helpers/nodemailer");
 
 class Controller {
   static async viewTransactions(req, res, next) {
@@ -24,7 +25,7 @@ class Controller {
         amount,
         date,
         currency,
-        location: location || "No location specified",
+        location: location || "Not specified",
         UserId: req.user.id,
       });
 
@@ -33,14 +34,23 @@ class Controller {
         result = await convert(currency, "IDR", dataTrans.id);
       } else result = dataTrans.amount;
 
-      await User.update(
-        { balance: dataUser.balance - +result },
-        { where: { id: dataUser.id } }
+      const updatedData = await User.update(
+        { balance: dataUser.balance - result },
+        { where: { id: dataUser.id }, returning: true }
       );
+
+      if (updatedData.balance < updatedData.saving) {
+        sendMail(
+          data.email,
+          "Just a little heads-up 🤔",
+          "Your balance has surpassed below your saving target. You might want to go easy on your spending.",
+          "<h1>Your balance has surpassed below your saving target. You might want to go easy on your spending.</h1>"
+        );
+      }
 
       TransTag.create({
         TransactionId: dataTrans.id,
-        TagId,
+        TagId: +TagId,
       });
       res.status(201).json(dataTrans);
     } catch (err) {
@@ -50,13 +60,15 @@ class Controller {
 
   static async editTransaction(req, res, next) {
     const transId = +req.params.id;
-    const { name, amount, date } = req.body;
+    const { name, amount, date, currency, location } = req.body;
     try {
       const newData = await Transaction.update(
         {
           name,
           amount,
           date,
+          currency,
+          location,
           UserId: req.user.id,
         },
         { where: { id: transId }, returning: true }
@@ -70,7 +82,19 @@ class Controller {
 
   static async deleteTransaction(req, res, next) {
     const transId = +req.params.id;
+    let result;
     try {
+      const transData = await Transaction.findByPk(transId);
+      const dataUser = await User.findByPk(req.user.id);
+      if (transData.currency !== "IDR") {
+        result = await convert(transData.currency, "IDR", transData.id);
+      } else result = transData.amount;
+
+      await User.update(
+        { balance: dataUser.balance + +result },
+        { where: { id: dataUser.id } }
+      );
+
       await Transaction.destroy({ where: { id: transId } });
       res.status(201).json({ message: "Transaction successfully deleted" });
     } catch (err) {
