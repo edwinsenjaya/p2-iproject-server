@@ -59,7 +59,7 @@ const transactions = [
     updatedAt: new Date(),
   },
   {
-    name: "Pay monthly Netflix subscription",
+    name: "Netflix monthly subscription",
     amount: 125000,
     date: new Date("July 3, 2021"),
     currency: "IDR",
@@ -95,10 +95,10 @@ const transactions = [
     updatedAt: new Date(),
   },
   {
-    name: "Spotify monthly subscription",
-    amount: 50000,
+    name: "Buy NFT",
+    amount: 0.8,
     date: new Date("June 27, 2021"),
-    currency: "IDR",
+    currency: "ETH",
     UserId: 1,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -339,13 +339,13 @@ const transTag = [
   },
   {
     TransactionId: 10,
-    TagId: 11,
+    TagId: 14,
     createdAt: new Date(),
     updatedAt: new Date(),
   },
   {
     TransactionId: 10,
-    TagId: 3,
+    TagId: 6,
     createdAt: new Date(),
     updatedAt: new Date(),
   },

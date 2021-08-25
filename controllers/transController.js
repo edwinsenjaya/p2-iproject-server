@@ -1,6 +1,7 @@
 const { Transaction, User, Tag, TransTag } = require("../models");
 const getRates = require("../apis/exchangerate");
 const getEthereum = require("../apis/cryptorate");
+const convert = require("../helpers/convertCurrency");
 
 class Controller {
   static async viewTransactions(req, res, next) {
@@ -18,6 +19,7 @@ class Controller {
 
   static async addTransaction(req, res, next) {
     const { name, amount, date, currency, TagId } = req.body;
+    let result;
     try {
       const dataTrans = await Transaction.create({
         name,
@@ -26,6 +28,16 @@ class Controller {
         currency,
         UserId: req.user.id,
       });
+
+      const dataUser = await User.findByPk(req.user.id);
+      if (currency !== "IDR") {
+        result = await convert(currency, "IDR", dataTrans.id);
+      } else result = dataTrans.amount;
+
+      await User.update(
+        { balance: dataUser.balance - +result },
+        { where: { id: dataUser.id } }
+      );
 
       TransTag.create({
         TransactionId: dataTrans.id,
@@ -75,114 +87,27 @@ class Controller {
       if (!dataTrans) {
         throw { name: "NotFound" };
       } else {
-        const rate = await getRates();
-        const ethRate = await getEthereum();
         const convertFrom = dataTrans.currency;
+        const result = await convert(convertFrom, convertTo, dataTrans.id);
 
-        if (convertTo === "ETH") {
-          const result = (dataTrans.amount / ethRate[convertFrom]).toFixed(5);
-
-          let newData = await Transaction.update(
-            {
-              currency: "ETH",
-              amount: result,
+        let newData = await Transaction.update(
+          {
+            currency: convertTo,
+            amount: result,
+          },
+          {
+            where: {
+              id: transId,
             },
-            {
-              where: {
-                id: transId,
-              },
-              returning: true,
-            }
-          );
-          newData = newData[1][0];
+            returning: true,
+          }
+        );
 
-          res.status(200).json({
-            message: `Successfully convert from  ${dataTrans.amount} ${convertFrom} to ${newData.amount} ETH`,
-          });
-        } else if (convertFrom === "ETH") {
-          const result = (dataTrans.amount * ethRate[convertTo]).toFixed(2);
+        newData = newData[1][0];
 
-          let newData = await Transaction.update(
-            {
-              currency: convertTo,
-              amount: result,
-            },
-            {
-              where: {
-                id: transId,
-              },
-              returning: true,
-            }
-          );
-          newData = newData[1][0];
-
-          res.status(200).json({
-            message: `Successfully convert from  ${dataTrans.amount} ETH to ${newData.amount} ${convertTo}`,
-          });
-        } else if (convertTo === "EUR") {
-          const result = (dataTrans.amount / rate[convertFrom]).toFixed(2);
-          let newData = await Transaction.update(
-            {
-              currency: "EUR",
-              amount: result,
-            },
-            {
-              where: {
-                id: transId,
-              },
-              returning: true,
-            }
-          );
-          newData = newData[1][0];
-
-          res.status(200).json({
-            message: `Successfully convert from  ${dataTrans.amount} ${convertFrom} to ${newData.amount} EUR`,
-          });
-        } else if (convertFrom === "EUR") {
-          const result = (dataTrans.amount * rate[convertTo]).toFixed(2);
-
-          let newData = await Transaction.update(
-            {
-              currency: convertTo,
-              amount: result,
-            },
-            {
-              where: {
-                id: transId,
-              },
-              returning: true,
-            }
-          );
-          newData = newData[1][0];
-
-          res.status(200).json({
-            message: `Successfully convert from  ${dataTrans.amount} EUR to ${newData.amount} ${convertTo}`,
-          });
-        } else {
-          const result = (
-            (dataTrans.amount / rate[convertFrom]) *
-            rate[convertTo]
-          ).toFixed(2);
-
-          let newData = await Transaction.update(
-            {
-              currency: convertTo,
-              amount: result,
-            },
-            {
-              where: {
-                id: transId,
-              },
-              returning: true,
-            }
-          );
-
-          newData = newData[1][0];
-
-          res.status(200).json({
-            message: `Successfully convert from ${dataTrans.amount} ${convertFrom} to ${newData.amount} ${convertTo}`,
-          });
-        }
+        res.status(200).json({
+          message: `Successfully convert from ${dataTrans.amount} ${convertFrom} to ${newData.amount} ${convertTo}`,
+        });
       }
     } catch (err) {
       next(err);
