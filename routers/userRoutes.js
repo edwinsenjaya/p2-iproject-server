@@ -7,6 +7,10 @@ router.post("/register", userController.register);
 
 router.post("/login", userController.login);
 
-router.patch("/budget", authentication, userController.addBudget);
+router.use(authentication);
+
+router.patch("/budget", userController.addBudget);
+
+router.patch("/saving", userController.changeSaving);
 
 module.exports = router;

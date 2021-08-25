@@ -71,6 +71,22 @@ class Controller {
       next(err);
     }
   }
+
+  static async changeSaving(req, res, next) {
+    const { saving } = req.body;
+    try {
+      let data = await User.update(
+        {
+          saving,
+        },
+        { where: { id: req.user.id }, returning: true }
+      );
+
+      res.status(200).json(data[1][0]);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = Controller;

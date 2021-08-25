@@ -1,6 +1,4 @@
 const { Transaction, User, Tag, TransTag } = require("../models");
-const getRates = require("../apis/exchangerate");
-const getEthereum = require("../apis/cryptorate");
 const convert = require("../helpers/convertCurrency");
 
 class Controller {
@@ -18,7 +16,7 @@ class Controller {
   }
 
   static async addTransaction(req, res, next) {
-    const { name, amount, date, currency, TagId } = req.body;
+    const { name, amount, date, currency, location, TagId } = req.body;
     let result;
     try {
       const dataTrans = await Transaction.create({
@@ -26,6 +24,7 @@ class Controller {
         amount,
         date,
         currency,
+        location: location || "No location specified",
         UserId: req.user.id,
       });
 

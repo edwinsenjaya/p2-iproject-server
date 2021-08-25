@@ -96,7 +96,7 @@ const transactions = [
   },
   {
     name: "Buy NFT",
-    amount: 0.8,
+    amount: 0.1,
     date: new Date("June 27, 2021"),
     currency: "ETH",
     UserId: 1,
