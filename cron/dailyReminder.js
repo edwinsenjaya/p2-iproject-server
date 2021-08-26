@@ -3,7 +3,9 @@ const sendMail = require("../helpers/nodemailer");
 const { User } = require("../models");
 
 const dailyReminder = function () {
-  cron.schedule("0 18 * * *", async () => {
+  console.log("starting cron");
+  cron.schedule("0 5 * * *", async () => {
+    console.log("running cron");
     try {
       const userData = await User.findAll();
       userData.forEach((el) => {
