@@ -1,12 +1,20 @@
 const { Transaction, User, Tag, TransTag } = require("../models");
 const convert = require("../helpers/convertCurrency");
 const sendMail = require("../helpers/nodemailer");
+const filterData = require("../helpers/filter");
 
 class Controller {
   static async viewTransactions(req, res, next) {
+    const paramQuery = filterData(req.query);
+    if (paramQuery.where === undefined) {
+      paramQuery.where = { UserId: req.user.id };
+    } else {
+      paramQuery.where.UserId = req.user.id;
+    }
+
     try {
       const data = await Transaction.findAll({
-        where: { UserId: req.user.id },
+        ...paramQuery,
         include: [{ model: User }, { model: Tag }],
       });
 
@@ -39,9 +47,9 @@ class Controller {
         { where: { id: dataUser.id }, returning: true }
       );
 
-      if (updatedData.balance < updatedData.saving) {
+      if (updatedData[1][0].balance < updatedData[1][0].saving) {
         sendMail(
-          data.email,
+          updatedData[1][0].email,
           "Just a little heads-up 🤔",
           "Your balance has surpassed below your saving target. You might want to go easy on your spending.",
           "<h1>Your balance has surpassed below your saving target. You might want to go easy on your spending.</h1>"

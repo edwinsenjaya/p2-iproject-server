@@ -13,9 +13,10 @@ class Controller {
   }
 
   static async addTag(req, res, next) {
-    const transId = req.params.id;
+    const transId = +req.params.id;
     const { addedTag } = req.body;
     try {
+      console.log(addedTag, "ATASIGFUDSKJF");
       const dataExist = await Tag.findByPk(+addedTag);
 
       if (dataExist) {
