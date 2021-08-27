@@ -68,21 +68,20 @@ class Controller {
 
   static async editTransaction(req, res, next) {
     const transId = +req.params.id;
-    const { name, amount, date, currency, location } = req.body;
+    const { name, amount, date, location } = req.body;
     try {
       const newData = await Transaction.update(
         {
           name,
           amount,
           date,
-          currency,
           location,
           UserId: req.user.id,
         },
         { where: { id: transId }, returning: true }
       );
 
-      res.status(201).json(newData);
+      res.status(201).json(newData[1][0]);
     } catch (err) {
       next(err);
     }
@@ -104,7 +103,7 @@ class Controller {
       );
 
       await Transaction.destroy({ where: { id: transId } });
-      res.status(201).json({ message: "Transaction successfully deleted" });
+      res.status(200).json({ message: "Transaction successfully deleted" });
     } catch (err) {
       next(err);
     }

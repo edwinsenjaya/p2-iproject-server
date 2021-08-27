@@ -16,7 +16,6 @@ class Controller {
     const transId = +req.params.id;
     const { addedTag } = req.body;
     try {
-      console.log(addedTag, "ATASIGFUDSKJF");
       const dataExist = await Tag.findByPk(+addedTag);
 
       if (dataExist) {
